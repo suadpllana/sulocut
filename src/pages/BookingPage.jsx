@@ -190,7 +190,10 @@ const SERVICE_TRANSLATIONS = {
     'haircut & beard': 'Prerje + Mjekër',
     'haircut and beard': 'Prerje + Mjekër',
     'hair wash': 'Larje flokësh',
-    styling: 'Stilizim'
+    styling: 'Stilizim',
+    'face treatment': 'Trajtim fytyre',
+    'all-in-one': 'Gjithçka në një',
+    'all in one': 'Gjithçka në një'
   }
 }
 
@@ -792,7 +795,7 @@ export function BookingPage({ language = 'sq' }) {
           <div className="grid gap-3.5 text-xs text-[var(--text-secondary)]">
             <SummaryRow icon={<Scissors size={14} className="text-[var(--accent-gold)]" />} label={copy.service} value={selectedService ? translateService(selectedService.name, language) : '-'} />
             <SummaryRow icon={<UserRound size={14} className="text-[var(--accent-gold)]" />} label={copy.barber} value={selectedBarber?.full_name || '-'} />
-            <SummaryRow icon={<CalendarDays size={14} className="text-[var(--accent-gold)]" />} label={copy.date} value={date || '-'} />
+            <SummaryRow icon={<CalendarDays size={14} className="text-[var(--accent-gold)]" />} label={copy.date} value={date ? formatLongDate(date, language) : '-'} />
             <SummaryRow icon={<Clock3 size={14} className="text-[var(--accent-gold)]" />} label={copy.time} value={selectedSlot?.start || '-'} />
             
             <div className="border-t border-white/5 pt-3.5 mt-2">
