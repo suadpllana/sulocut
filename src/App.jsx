@@ -81,6 +81,13 @@ export default function App() {
   const canAccessAdminArea = profileRole === 'admin' || profileRole === 'owner'
   const allowedHere = isBarberRoute ? canAccessBarberArea : isAdminRoute ? canAccessAdminArea : true
 
+  useEffect(() => {
+    if (route === '/') {
+      window.history.replaceState({}, '', '/home')
+      setRoute('/home')
+    }
+  }, [route])
+
   // Kick a SIGNED-IN user off a protected route they may not enter. When signed
   // out we keep them so the dashboard can show its login form.
   useEffect(() => {
