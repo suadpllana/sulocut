@@ -1,6 +1,6 @@
 import { Scissors, Phone, MapPin, Instagram, Clock } from 'lucide-react'
 
-export function SiteFooter({ language }) {
+export function SiteFooter({ language, canAccessBarberArea, canAccessAdminArea }) {
   const navigate = (to, e) => {
     if (e) e.preventDefault()
     window.history.pushState({}, '', to)
@@ -18,6 +18,7 @@ export function SiteFooter({ language }) {
     home: language === 'sq' ? 'Kreu' : 'Home',
     booking: language === 'sq' ? 'Rezervo Tani' : 'Book Now',
     barberArea: language === 'sq' ? 'Zona Barber' : 'Barber Area',
+    adminArea: language === 'sq' ? 'Admin' : 'Admin',
   }
 
   return (
@@ -28,8 +29,8 @@ export function SiteFooter({ language }) {
           {/* Brand Info */}
           <div className="flex flex-col gap-4">
             <a 
-              href="/" 
-              onClick={(e) => navigate('/', e)} 
+              href="/home" 
+              onClick={(e) => navigate('/home', e)} 
               className="flex items-center gap-3 w-fit active:scale-98 transition-transform group"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border-gold)] bg-white/5 text-[var(--accent-gold)]">
@@ -63,8 +64,8 @@ export function SiteFooter({ language }) {
             <ul className="flex flex-col gap-2.5 text-xs">
               <li>
                 <a
-                  href="/"
-                  onClick={(e) => navigate('/', e)}
+                  href="/home"
+                  onClick={(e) => navigate('/home', e)}
                   className="hover:text-[var(--accent-gold)] transition-colors"
                 >
                   {t.home}
@@ -79,15 +80,28 @@ export function SiteFooter({ language }) {
                   {t.booking}
                 </a>
               </li>
-              <li>
-                <a
-                  href="/barber"
-                  onClick={(e) => navigate('/barber', e)}
-                  className="hover:text-[var(--accent-gold)] transition-colors"
-                >
-                  {t.barberArea}
-                </a>
-              </li>
+              {canAccessBarberArea && (
+                <li>
+                  <a
+                    href="/barber"
+                    onClick={(e) => navigate('/barber', e)}
+                    className="hover:text-[var(--accent-gold)] transition-colors"
+                  >
+                    {t.barberArea}
+                  </a>
+                </li>
+              )}
+              {canAccessAdminArea && (
+                <li>
+                  <a
+                    href="/admin"
+                    onClick={(e) => navigate('/admin', e)}
+                    className="hover:text-[var(--accent-gold)] transition-colors"
+                  >
+                    {t.adminArea}
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 

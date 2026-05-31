@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Scissors, Menu, X, Globe } from 'lucide-react'
 import { InstallButton } from './InstallButton'
 
-export function SiteHeader({ currentRoute, language, setLanguage }) {
+export function SiteHeader({ currentRoute, language, setLanguage, canAccessBarberArea, canAccessAdminArea }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navigate = (to, e) => {
@@ -12,9 +12,10 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
     setMobileMenuOpen(false)
   }
 
-  const isHome = currentRoute === '/'
+  const isHome = currentRoute === '/' || currentRoute === '/home'
   const isBooking = currentRoute === '/booking'
   const isBarber = currentRoute === '/barber'
+  const isAdmin = currentRoute === '/admin'
 
   // Translation helpers
   const t = {
@@ -23,6 +24,7 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
     barbers: language === 'sq' ? 'Stafi' : 'Barbers',
     contact: language === 'sq' ? 'Kontakt' : 'Contact',
     barberArea: language === 'sq' ? 'Zona Barber' : 'Barber Area',
+    adminArea: language === 'sq' ? 'Admin' : 'Admin',
   }
 
   return (
@@ -30,8 +32,8 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         {/* Brand Logo */}
         <a 
-          href="/" 
-          onClick={(e) => navigate('/', e)} 
+          href="/home" 
+          onClick={(e) => navigate('/home', e)} 
           className="flex items-center gap-3 active:scale-98 transition-transform group"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border-gold)] bg-white/5 text-[var(--accent-gold)] group-hover:bg-[var(--accent-gold)] group-hover:text-[#0a0805] transition-all duration-300">
@@ -50,8 +52,8 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-8">
           <a
-            href="/"
-            onClick={(e) => navigate('/', e)}
+            href="/home"
+            onClick={(e) => navigate('/home', e)}
             className={`font-display text-sm tracking-wider transition-colors hover:text-[var(--accent-gold)] ${
               isHome ? 'text-[var(--accent-gold)] border-b border-[var(--accent-gold)] pb-0.5' : 'text-[var(--text-secondary)]'
             }`}
@@ -67,15 +69,28 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
           >
             {t.booking}
           </a>
-          <a
-            href="/barber"
-            onClick={(e) => navigate('/barber', e)}
-            className={`font-display text-sm tracking-wider transition-colors hover:text-[var(--accent-gold)] ${
-              isBarber ? 'text-[var(--accent-gold)] border-b border-[var(--accent-gold)] pb-0.5' : 'text-[var(--text-secondary)]'
-            }`}
-          >
-            {t.barberArea}
-          </a>
+          {canAccessBarberArea && (
+            <a
+              href="/barber"
+              onClick={(e) => navigate('/barber', e)}
+              className={`font-display text-sm tracking-wider transition-colors hover:text-[var(--accent-gold)] ${
+                isBarber ? 'text-[var(--accent-gold)] border-b border-[var(--accent-gold)] pb-0.5' : 'text-[var(--text-secondary)]'
+              }`}
+            >
+              {t.barberArea}
+            </a>
+          )}
+          {canAccessAdminArea && (
+            <a
+              href="/admin"
+              onClick={(e) => navigate('/admin', e)}
+              className={`font-display text-sm tracking-wider transition-colors hover:text-[var(--accent-gold)] ${
+                isAdmin ? 'text-[var(--accent-gold)] border-b border-[var(--accent-gold)] pb-0.5' : 'text-[var(--text-secondary)]'
+              }`}
+            >
+              {t.adminArea}
+            </a>
+          )}
         </nav>
 
         {/* Action Controls (Desktop) */}
@@ -136,8 +151,8 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
         <div className="md:hidden border-t border-white/5 bg-[#0a0805]/98 px-6 py-6 animate-fade-in">
           <nav className="flex flex-col gap-5">
             <a
-              href="/"
-              onClick={(e) => navigate('/', e)}
+              href="/home"
+              onClick={(e) => navigate('/home', e)}
               className={`font-display text-lg tracking-wider transition-colors ${
                 isHome ? 'text-[var(--accent-gold)] font-bold' : 'text-[var(--text-secondary)]'
               }`}
@@ -153,15 +168,28 @@ export function SiteHeader({ currentRoute, language, setLanguage }) {
             >
               {t.booking}
             </a>
-            <a
-              href="/barber"
-              onClick={(e) => navigate('/barber', e)}
-              className={`font-display text-lg tracking-wider transition-colors ${
-                isBarber ? 'text-[var(--accent-gold)] font-bold' : 'text-[var(--text-secondary)]'
-              }`}
-            >
-              {t.barberArea}
-            </a>
+            {canAccessBarberArea && (
+              <a
+                href="/barber"
+                onClick={(e) => navigate('/barber', e)}
+                className={`font-display text-lg tracking-wider transition-colors ${
+                  isBarber ? 'text-[var(--accent-gold)] font-bold' : 'text-[var(--text-secondary)]'
+                }`}
+              >
+                {t.barberArea}
+              </a>
+            )}
+            {canAccessAdminArea && (
+              <a
+                href="/admin"
+                onClick={(e) => navigate('/admin', e)}
+                className={`font-display text-lg tracking-wider transition-colors ${
+                  isAdmin ? 'text-[var(--accent-gold)] font-bold' : 'text-[var(--text-secondary)]'
+                }`}
+              >
+                {t.adminArea}
+              </a>
+            )}
           </nav>
         </div>
       )}

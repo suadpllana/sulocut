@@ -1,5 +1,14 @@
+// Local-calendar date as YYYY-MM-DD (NOT UTC). Using toISOString() here would
+// roll over to the next day every evening for UTC+1/+2 timezones like Kosovo.
+export function toISODate(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+  return toISODate(new Date())
 }
 
 export function toMinutes(time) {

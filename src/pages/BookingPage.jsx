@@ -7,15 +7,15 @@ import {
   MapPin,
   Phone,
   Scissors,
-  ShieldCheck,
   Sparkles,
   Star,
   UserRound,
-  Wallet
+  Wallet,
+  X
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAppointmentsRealtime } from '../hooks/useAppointmentsRealtime'
-import { buildAvailableSlots, dayOfWeek, todayISO, toTime } from '../utils/time'
+import { buildAvailableSlots, dayOfWeek, toISODate, todayISO, toTime } from '../utils/time'
 
 const COPY = {
   sq: {
@@ -46,6 +46,11 @@ const COPY = {
     confirm: 'Konfirmo rezervimin',
     confirming: 'Duke konfirmuar...',
     confirmed: 'Rezervimi u konfirmua me sukses! Pagesa bëhet cash në dyqan.',
+    successTitle: 'Rezervimi u konfirmua!',
+    successText: 'Të presim në dyqan. Pagesa bëhet cash pas shërbimit.',
+    clientLabel: 'Klienti',
+    bookAnother: 'Bëj një rezervim tjetër',
+    close: 'Mbyll',
     unavailable: 'Ky orar nuk është më i lirë.',
     summary: 'Përmbledhje',
     service: 'Shërbimi',
@@ -113,6 +118,11 @@ const COPY = {
     confirm: 'Confirm appointment',
     confirming: 'Confirming...',
     confirmed: 'Appointment confirmed successfully! Pay in cash at the shop.',
+    successTitle: 'Appointment confirmed!',
+    successText: 'See you at the shop. Payment is in cash after the service.',
+    clientLabel: 'Client',
+    bookAnother: 'Book another appointment',
+    close: 'Close',
     unavailable: 'This time is no longer available.',
     summary: 'Summary',
     service: 'Service',
@@ -163,7 +173,7 @@ function buildDateOptions(copy, language) {
   return Array.from({ length: 8 }, (_, index) => {
     const date = new Date()
     date.setDate(date.getDate() + index)
-    const iso = date.toISOString().slice(0, 10)
+    const iso = toISODate(date)
     const sqWeekdays = ['Die', 'Hën', 'Mar', 'Mër', 'Enj', 'Pre', 'Sht']
     const sqMonths = ['jan', 'shk', 'mar', 'pri', 'maj', 'qer', 'kor', 'gush', 'sht', 'tet', 'nën', 'dhj']
 
@@ -219,6 +229,7 @@ export function BookingPage({ language = 'sq' }) {
   const [form, setForm] = useState({ firstName: '', lastName: '', phone: '' })
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+  const [confirmation, setConfirmation] = useState(null)
 
   useEffect(() => {
     async function loadCatalog() {
@@ -380,7 +391,15 @@ export function BookingPage({ language = 'sq' }) {
       return
     }
 
-    setStatus(copy.confirmed)
+    setStatus('')
+    setConfirmation({
+      service: selectedService.name,
+      barber: selectedBarber.full_name,
+      date,
+      time: selectedSlot.start,
+      price: selectedService.price,
+      customer: `${form.firstName.trim()} ${form.lastName.trim()}`.trim()
+    })
     setForm({ firstName: '', lastName: '', phone: '' })
     setSelectedSlot(null)
     loadSlotsContext()
@@ -768,12 +787,67 @@ export function BookingPage({ language = 'sq' }) {
         </div>
       </section>
 
-      {/* Floating Status Notification */}
+      {/* Floating Error Notification */}
       {status && (
-        <div className="fixed inset-x-4 bottom-28 z-45 mx-auto max-w-md rounded-xl border border-[var(--border-gold)] bg-[#12100d]/95 backdrop-blur-md px-5 py-4 shadow-2xl animate-fade-in lg:bottom-8">
-          <p className="text-xs font-bold text-center text-white tracking-wide">
+        <div className="fixed inset-x-4 bottom-28 z-45 mx-auto max-w-md rounded-xl border border-red-500/30 bg-[#12100d]/95 backdrop-blur-md px-5 py-4 shadow-2xl animate-fade-in lg:bottom-8">
+          <p className="text-xs font-bold text-center text-red-300 tracking-wide">
             {status}
           </p>
+        </div>
+      )}
+
+      {/* Success Confirmation Modal */}
+      {confirmation && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-[#0a0805]/85 backdrop-blur-sm px-3 sm:items-center animate-fade-in"
+          onClick={() => setConfirmation(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-t-2xl border border-[var(--border-gold)] bg-[#12100d] p-6 shadow-2xl safe-bottom sm:rounded-2xl relative overflow-hidden"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-[var(--accent-gold)]/10 blur-2xl pointer-events-none" />
+
+            <button
+              type="button"
+              onClick={() => setConfirmation(null)}
+              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 bg-white/5 text-[var(--text-secondary)] hover:text-white transition-all cursor-pointer"
+              aria-label={copy.close}
+            >
+              <X size={16} />
+            </button>
+
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--border-gold)] bg-[var(--accent-gold-muted)] text-[var(--accent-gold)]">
+              <CheckCircle2 size={32} />
+            </div>
+
+            <h2 className="text-center font-display text-2xl font-extrabold uppercase tracking-wider text-white">
+              {copy.successTitle}
+            </h2>
+            <p className="mt-2 text-center text-xs text-[var(--text-secondary)] leading-relaxed">
+              {copy.successText}
+            </p>
+
+            <div className="mt-6 grid gap-3 rounded-xl border border-white/5 bg-[#0a0805]/50 p-4 text-xs">
+              <SummaryRow icon={<UserRound size={14} className="text-[var(--accent-gold)]" />} label={copy.clientLabel} value={confirmation.customer} />
+              <SummaryRow icon={<Scissors size={14} className="text-[var(--accent-gold)]" />} label={copy.service} value={confirmation.service} />
+              <SummaryRow icon={<UserRound size={14} className="text-[var(--accent-gold)]" />} label={copy.barber} value={confirmation.barber} />
+              <SummaryRow icon={<CalendarDays size={14} className="text-[var(--accent-gold)]" />} label={copy.date} value={confirmation.date} />
+              <SummaryRow icon={<Clock3 size={14} className="text-[var(--accent-gold)]" />} label={copy.time} value={confirmation.time} />
+              <div className="flex items-center justify-between gap-3 border-t border-white/5 pt-3">
+                <span className="font-bold uppercase tracking-wider text-white">{copy.total}</span>
+                <span className="font-display text-lg font-bold text-[var(--accent-gold)]">{formatEuro(confirmation.price)}</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setConfirmation(null)}
+              className="btn-gold w-full mt-6 cursor-pointer"
+            >
+              {copy.bookAnother}
+            </button>
+          </div>
         </div>
       )}
     </div>

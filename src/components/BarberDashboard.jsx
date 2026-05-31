@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { 
   LogOut, 
   Plus, 
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAppointmentsRealtime } from '../hooks/useAppointmentsRealtime'
-import { todayISO } from '../utils/time'
+import { toISODate, todayISO } from '../utils/time'
 import { WalkInModal } from './WalkInModal'
 
 export function BarberDashboard() {
@@ -49,6 +49,11 @@ export function BarberDashboard() {
 
   const today = todayISO()
 
+  const navigate = (to) => {
+    window.history.pushState({}, '', to)
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }
+
   // Authentication monitoring
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
@@ -70,7 +75,7 @@ export function BarberDashboard() {
           .from('profiles')
           .select('id, full_name, role, phone')
           .eq('auth_user_id', session.user.id)
-          .in('role', ['barber', 'owner'])
+          .in('role', ['barber', 'owner', 'admin'])
           .single()
         
         if (profileError) throw profileError
@@ -83,11 +88,16 @@ export function BarberDashboard() {
     loadProfile()
   }, [session])
 
+  // Tracks whether the dashboard has loaded at least once so background
+  // refreshes (realtime / polling) don't flash the loading indicator.
+  const hasLoadedRef = useRef(false)
+
   // Load All Relevant Data for Dashboard
   const loadDashboard = useCallback(async () => {
     if (!profile?.id) return
 
-    setLoading(true)
+    const isInitialLoad = !hasLoadedRef.current
+    if (isInitialLoad) setLoading(true)
     try {
       // Fetch:
       // 1. Appointments (recent 300 appointments for client history, weekly overview, and analytics calculations)
@@ -126,7 +136,8 @@ export function BarberDashboard() {
     } catch (err) {
       console.error('Dashboard data load failed:', err)
     } finally {
-      setLoading(false)
+      hasLoadedRef.current = true
+      if (isInitialLoad) setLoading(false)
     }
   }, [profile?.id])
 
@@ -196,7 +207,7 @@ export function BarberDashboard() {
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date()
       d.setDate(d.getDate() + i)
-      const iso = d.toISOString().slice(0, 10)
+      const iso = toISODate(d)
       const sqDays = ['Die', 'Hën', 'Mar', 'Mër', 'Enj', 'Pre', 'Sht']
       return {
         iso,
@@ -224,12 +235,12 @@ export function BarberDashboard() {
     // Current Week Range (last 7 days)
     const sevenDaysAgo = new Date()
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    const sevenDaysAgoISO = sevenDaysAgo.toISOString().slice(0, 10)
+    const sevenDaysAgoISO = toISODate(sevenDaysAgo)
 
     // Current Month Range (last 30 days)
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    const thirtyDaysAgoISO = thirtyDaysAgo.toISOString().slice(0, 10)
+    const thirtyDaysAgoISO = toISODate(thirtyDaysAgo)
 
     const completed = appointments.filter((apt) => apt.status === 'completed')
     const noShows = appointments.filter((apt) => apt.status === 'no_show')
@@ -307,6 +318,15 @@ export function BarberDashboard() {
       <section className="mx-auto flex min-h-[calc(100vh-10rem)] w-full max-w-md flex-col justify-center px-4 py-12">
         <div className="premium-card p-8 shadow-2xl relative overflow-hidden border border-white/5 bg-[#12100d]">
           <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[var(--accent-gold)]/5 blur-2xl pointer-events-none" />
+
+          <button
+            type="button"
+            onClick={() => navigate('/home')}
+            className="mb-6 inline-flex items-center gap-2 rounded-lg border border-white/5 bg-white/5 px-3 py-2 text-xs font-bold font-display uppercase tracking-wider text-[var(--text-secondary)] transition-all hover:border-[var(--border-gold)] hover:text-[var(--accent-gold)]"
+          >
+            <ChevronLeft size={14} />
+            Kthehu
+          </button>
           
           <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[var(--border-gold)] bg-white/5 text-[var(--accent-gold)] mb-6">
             <Scissors size={26} className="rotate-90" />
@@ -450,16 +470,27 @@ export function BarberDashboard() {
         
         {/* Header (Greeting & Mini Details) */}
         <header className="mb-8 flex items-center justify-between gap-4 border-b border-white/5 pb-5">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 rounded-md border border-[#0f766e]/30 bg-[#0f766e]/10 px-2 py-0.5 text-[9px] font-bold font-display uppercase tracking-wider text-[#14b8a6]">
-                <Sparkles size={10} className="animate-pulse" /> Live updates
-              </span>
-              {loading && <span className="text-[9px] text-[var(--text-muted)] animate-pulse">Duke u ringarkuar...</span>}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/home')}
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/5 bg-white/5 px-3 text-xs font-bold font-display uppercase tracking-wider text-[var(--text-secondary)] transition-all hover:border-[var(--border-gold)] hover:text-[var(--accent-gold)]"
+            >
+              <ChevronLeft size={14} />
+              <span className="hidden sm:inline">Kthehu</span>
+            </button>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 rounded-md border border-[#0f766e]/30 bg-[#0f766e]/10 px-2 py-0.5 text-[9px] font-bold font-display uppercase tracking-wider text-[#14b8a6]">
+                  <Sparkles size={10} className="animate-pulse" /> Live updates
+                </span>
+                {loading && <span className="text-[9px] text-[var(--text-muted)] animate-pulse">Duke u ringarkuar...</span>}
+              </div>
+              <h1 className="mt-1 font-display text-2xl md:text-3xl font-extrabold tracking-wider text-white uppercase">
+                {greeting}, {profile?.full_name?.split(' ')?.[0] || 'Barber'}!
+              </h1>
             </div>
-            <h1 className="mt-1 font-display text-2xl md:text-3xl font-extrabold tracking-wider text-white uppercase">
-              {greeting}, {profile?.full_name?.split(' ')?.[0] || 'Barber'}!
-            </h1>
           </div>
           
           <button 
