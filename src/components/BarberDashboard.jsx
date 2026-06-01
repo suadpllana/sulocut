@@ -343,7 +343,7 @@ export function BarberDashboard() {
                 required 
                 value={email} 
                 onChange={(event) => setEmail(event.target.value)} 
-                placeholder="email@barberbrothers.style" 
+                placeholder="email@sulocut.com" 
                 className="w-full rounded-lg border border-white/5 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-gold)] focus:bg-white/10 transition-all" 
               />
             </label>
