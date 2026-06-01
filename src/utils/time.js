@@ -57,12 +57,14 @@ export function buildAvailableSlots({
 
     for (let start = dayStart; start + serviceDuration <= dayEnd; start += 30) {
       const end = start + serviceDuration
-      // A slot is reserved only when a booking actually starts at this exact
-      // time — not when it merely falls inside a longer booking's window.
-      // Otherwise a 60-min booking at 17:00 would also mark 17:30 as reserved.
-      // We keep reserved slots in the list so the UI shows them disabled
-      // instead of removing them.
-      const reserved = booked.some((bookedSlot) => bookedSlot.start === start)
+      // A slot is reserved if the service starting here would overlap any
+      // existing booking — this matches the server's full-duration check, so a
+      // 60-min booking at 11:30 (11:30–12:30) also disables 12:00. We keep
+      // reserved slots in the list so the UI shows them disabled instead of
+      // removing them.
+      const reserved = booked.some((bookedSlot) =>
+        intervalsOverlap(start, end, bookedSlot.start, bookedSlot.end)
+      )
       slots.push({ start: toTime(start), end: toTime(end), reserved })
     }
 

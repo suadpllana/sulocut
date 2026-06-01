@@ -504,13 +504,8 @@ export function BookingPage({ language = 'sq' }) {
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 rounded-lg border border-[var(--border-gold)] bg-[var(--accent-gold-muted)] px-3 py-1 text-xs font-bold text-[var(--accent-gold)] font-display uppercase tracking-wider">
-              <span className="pulse-badge" />
-              {copy.liveBadge}
-            </span>
-            <span className="rounded-lg border border-white/5 bg-white/5 px-3 py-1 text-xs font-bold text-[var(--text-secondary)] font-display uppercase tracking-wider">
-              {copy.noLogin}
-            </span>
+        
+      
           </div>
         </div>
       </div>
