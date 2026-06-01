@@ -22,21 +22,26 @@ export function SiteFooter({ language, canAccessBarberArea, canAccessAdminArea }
   }
 
   return (
-    <footer className="border-t border-white/5 bg-[#0a0805] text-[var(--text-secondary)]">
-      <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+    <footer className="relative border-t border-white/5 bg-[#0a0805] text-[var(--text-secondary)]">
+      {/* glowing gradient hairline along the top */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent-gold)]/60 to-transparent" />
+      <div className="aurora">
+        <div className="aurora-blob aurora-blob--gold h-64 w-64 -top-24 right-1/4 opacity-15" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
-          
+
           {/* Brand Info */}
           <div className="flex flex-col gap-4">
-            <a 
-              href="/home" 
-              onClick={(e) => navigate('/home', e)} 
-              className="flex items-center gap-3 w-fit active:scale-98 transition-transform group"
+            <a
+              href="/home"
+              onClick={(e) => navigate('/home', e)}
+              className="flex items-center gap-3 w-fit active:scale-95 transition-transform group"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border-gold)] bg-white/5 text-[var(--accent-gold)]">
-                <Scissors size={18} className="rotate-90" />
+              <div className="gradient-border flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border-gold)] bg-white/5 text-[var(--accent-gold)] transition-all duration-500 group-hover:text-white group-hover:shadow-[0_0_22px_-4px_rgba(200,169,126,0.7)]">
+                <Scissors size={18} className="rotate-90 transition-transform duration-700 group-hover:rotate-[200deg]" />
               </div>
-              <h2 className="font-display text-lg font-bold tracking-widest text-[#f5f3ef]">
+              <h2 className="font-display text-lg font-bold tracking-widest text-shimmer">
                 SuLoCut
               </h2>
             </a>
@@ -48,7 +53,7 @@ export function SiteFooter({ language, canAccessBarberArea, canAccessAdminArea }
                 href="https://www.instagram.com/brotherscutss/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-8 w-8 items-center justify-center rounded-md border border-white/5 bg-white/5 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)] hover:text-[#0a0805] transition-all"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[var(--accent-gold)] transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--accent-gold)] hover:text-[#0a0805] hover:shadow-[0_0_20px_-4px_rgba(200,169,126,0.8)]"
                 aria-label="Instagram"
               >
                 <Instagram size={16} />

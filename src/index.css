@@ -50,16 +50,21 @@ body {
 
 /* Premium Card / Glassmorphism panel */
 .premium-card {
-  background: rgba(18, 16, 13, 0.7);
+  position: relative;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(200, 169, 126, 0.06) 0%, transparent 45%),
+    rgba(18, 16, 13, 0.7);
   border: 1px solid var(--border-color);
   backdrop-filter: blur(12px);
   border-radius: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .premium-card:hover {
   border-color: var(--border-gold);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  box-shadow:
+    0 18px 50px -20px rgba(0, 0, 0, 0.8),
+    0 0 30px -12px rgba(200, 169, 126, 0.25);
 }
 
 .premium-card-gold {
@@ -77,7 +82,9 @@ body {
 
 /* Premium Buttons */
 .btn-gold {
-  background-color: var(--accent-gold);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #d8bd95 0%, var(--accent-gold) 55%, #b8975f 100%);
   color: var(--bg-primary);
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
@@ -92,14 +99,26 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 1px solid var(--accent-gold);
+  border: 1px solid rgba(200, 169, 126, 0.6);
+}
+
+/* Light sweep across gold buttons on hover */
+.btn-gold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-150%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-gold:hover {
-  background-color: var(--accent-gold-hover);
-  border-color: var(--accent-gold-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(200, 169, 126, 0.2);
+  box-shadow: 0 12px 30px -6px rgba(200, 169, 126, 0.45);
+}
+
+.btn-gold:hover::after {
+  transform: translateX(150%);
 }
 
 .btn-gold:active {
@@ -215,4 +234,196 @@ body {
 
 .safe-top {
   padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+/* ============================================================
+   AMPLIFIED DARK-LUXE LAYER
+   Aurora backgrounds, rotating gradient borders, shine sweeps,
+   scroll reveals, glows and micro-motion.
+   ============================================================ */
+
+/* ---- Aurora / floating ambient background ---- */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.aurora-blob--gold {
+  background: radial-gradient(circle at center, rgba(200, 169, 126, 0.45), transparent 70%);
+}
+
+.aurora-blob--teal {
+  background: radial-gradient(circle at center, rgba(15, 118, 110, 0.4), transparent 70%);
+}
+
+@keyframes auroraDrift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(6%, -8%, 0) scale(1.15); }
+  66%  { transform: translate3d(-5%, 6%, 0) scale(0.92); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.aurora-blob {
+  animation: auroraDrift 18s ease-in-out infinite;
+}
+
+/* ---- Floating accents ---- */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-18px); }
+}
+
+.animate-float { animation: floatY 7s ease-in-out infinite; }
+.animate-float-slow { animation: floatY 11s ease-in-out infinite; }
+
+/* ---- Rotating conic gradient border ---- */
+@property --bd-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes bdRotate { to { --bd-angle: 360deg; } }
+
+.gradient-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--bd-angle),
+    transparent 0%,
+    rgba(200, 169, 126, 0.9) 12%,
+    transparent 30%,
+    transparent 60%,
+    rgba(200, 169, 126, 0.55) 78%,
+    transparent 92%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: bdRotate 6s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ---- Shine sweep (hover) ---- */
+.shine { position: relative; overflow: hidden; }
+
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.12) 50%, transparent 65%);
+  transform: translateX(-150%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.shine:hover::after { transform: translateX(150%); }
+
+/* ---- Shimmering display text ---- */
+@keyframes textShimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(110deg, #f5f3ef 35%, #e9d4ad 48%, #c8a97e 55%, #f5f3ef 72%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 6s linear infinite;
+}
+
+/* ---- Soft gold glow ---- */
+.glow-gold { box-shadow: 0 0 45px -10px rgba(200, 169, 126, 0.4); }
+.glow-gold-strong { box-shadow: 0 0 70px -8px rgba(200, 169, 126, 0.5); }
+
+/* ---- Hover lift for interactive cards ---- */
+.lift-hover { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease; }
+.lift-hover:hover { transform: translateY(-6px); }
+
+/* ---- Scroll reveal ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* ---- Animated section underline ---- */
+@keyframes underlineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.divider-gold {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  transform-origin: center;
+}
+
+/* ---- Marquee strip ---- */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 28s linear infinite;
+}
+
+/* ---- Entrance for hero content ---- */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rise-in {
+  opacity: 0;
+  animation: riseIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ---- Slot pop (booking grid) ---- */
+@keyframes slotPop {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.slot-pop { animation: slotPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+/* ---- Header scroll state ---- */
+.header-scrolled {
+  background: rgba(10, 8, 5, 0.85) !important;
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.9);
+}
+
+/* ---- Respect reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }

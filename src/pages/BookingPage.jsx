@@ -490,16 +490,20 @@ export function BookingPage({ language = 'sq' }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0805] text-[#f5f3ef]">
-      
+    <div className="min-h-screen bg-[#0a0805] text-[#f5f3ef] overflow-hidden">
+
       {/* Mini Hero Banner */}
-      <div className="border-b border-white/5 bg-[#0f0d0a]/60 py-8">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <span className="font-display text-xs font-bold tracking-widest text-[var(--accent-gold)] uppercase block mb-1">
+      <div className="relative border-b border-white/5 bg-[#0f0d0a]/60 py-10">
+        <div className="aurora">
+          <div className="aurora-blob aurora-blob--gold h-72 w-72 -top-24 right-10 opacity-30" />
+          <div className="aurora-blob aurora-blob--teal h-60 w-60 -bottom-20 left-1/4 opacity-20" style={{ animationDelay: '-7s' }} />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="rise-in">
+            <span className="font-display text-xs font-bold tracking-[0.3em] text-[var(--accent-gold)] uppercase block mb-1">
               {copy.heroEyebrow}
             </span>
-            <h2 className="font-display text-2xl md:text-3xl font-extrabold tracking-wider text-white">
+            <h2 className="font-display text-2xl md:text-4xl font-extrabold tracking-wider text-shimmer">
               {language === 'sq' ? 'APLIKIMI I REZERVIMIT' : 'ONLINE BOOKING SYSTEM'}
             </h2>
           </div>
@@ -529,9 +533,9 @@ export function BookingPage({ language = 'sq' }) {
               return (
                 <span
                   key={label}
-                  className={`shrink-0 rounded-lg border px-3.5 py-2 text-xs font-bold font-display uppercase tracking-wider transition-all ${
+                  className={`shrink-0 rounded-lg border px-3.5 py-2 text-xs font-bold font-display uppercase tracking-wider transition-all duration-300 ${
                     isActive
-                      ? 'border-[var(--accent-gold)] bg-[#191612] text-[var(--accent-gold)]'
+                      ? 'border-[var(--accent-gold)] bg-[#191612] text-[var(--accent-gold)] shadow-[0_0_18px_-6px_rgba(200,169,126,0.6)]'
                       : 'border-white/5 bg-[#0f0d0a]/50 text-[var(--text-muted)]'
                   }`}
                 >
@@ -695,7 +699,7 @@ export function BookingPage({ language = 'sq' }) {
 
               {selectedBarber && (
                 <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6">
-                  {availableSlots.map((slot) => {
+                  {availableSlots.map((slot, index) => {
                     const isSelected = selectedSlot?.start === slot.start
                     return (
                       <button
@@ -704,12 +708,13 @@ export function BookingPage({ language = 'sq' }) {
                         disabled={slot.reserved}
                         title={slot.reserved ? copy.reserved : undefined}
                         onClick={() => setSelectedSlot(slot)}
-                        className={`rounded-xl border py-3.5 text-center font-display text-sm font-bold tracking-wider transition-all active:scale-[0.98] ${
+                        style={{ animationDelay: `${Math.min(index * 25, 400)}ms` }}
+                        className={`slot-pop rounded-xl border py-3.5 text-center font-display text-sm font-bold tracking-wider transition-all duration-300 active:scale-[0.95] ${
                           slot.reserved
                             ? 'cursor-not-allowed border-white/5 bg-[#0a0805]/60 text-[var(--text-muted)] line-through opacity-50'
                             : isSelected
-                            ? 'cursor-pointer border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[#0a0805]'
-                            : 'cursor-pointer border-white/5 bg-[#12100d]/80 text-white hover:border-white/10 hover:bg-[#12100d]'
+                            ? 'cursor-pointer scale-105 border-[var(--accent-gold)] bg-[var(--accent-gold)] text-[#0a0805] shadow-[0_0_22px_-4px_rgba(200,169,126,0.8)]'
+                            : 'cursor-pointer border-white/5 bg-[#12100d]/80 text-white hover:-translate-y-0.5 hover:border-[var(--border-gold)] hover:bg-[#191612]'
                         }`}
                       >
                         {slot.start}
@@ -779,7 +784,7 @@ export function BookingPage({ language = 'sq' }) {
         </div>
 
         {/* Floating / Sticky Booking Summary Sidebar */}
-        <aside className="fixed inset-x-3 bottom-3 z-30 mx-auto max-w-md rounded-2xl border border-white/5 bg-[#0f0d0a]/95 p-5 shadow-2xl backdrop-blur-md safe-bottom lg:sticky lg:top-24 lg:bottom-auto lg:mx-0 lg:max-w-none lg:self-start lg:translate-x-4 lg:bg-[#12100d]/80 lg:shadow-sm xl:translate-x-6">
+        <aside className="gradient-border fixed inset-x-3 bottom-3 z-30 mx-auto max-w-md rounded-2xl border border-[var(--border-gold)] bg-[#0f0d0a]/95 p-5 shadow-2xl backdrop-blur-md safe-bottom lg:sticky lg:top-24 lg:bottom-auto lg:mx-0 lg:max-w-none lg:self-start lg:translate-x-4 lg:bg-[#12100d]/80 lg:shadow-[0_0_40px_-12px_rgba(200,169,126,0.3)] xl:translate-x-6">
           <div className="mb-4 flex items-center justify-between gap-3 pb-3 border-b border-white/5">
             <h2 className="font-display text-lg font-bold tracking-wider text-white uppercase">{copy.summary}</h2>
             <span className="rounded-md border border-[var(--border-gold)] bg-[var(--accent-gold-muted)] px-2.5 py-0.5 text-[10px] font-bold font-display uppercase tracking-wider text-[var(--accent-gold)]">
@@ -890,7 +895,7 @@ export function BookingPage({ language = 'sq' }) {
           onClick={() => setConfirmation(null)}
         >
           <div
-            className="w-full max-w-md rounded-t-2xl border border-[var(--border-gold)] bg-[#12100d] p-6 shadow-2xl safe-bottom sm:rounded-2xl relative overflow-hidden"
+            className="gradient-border w-full max-w-md rounded-t-2xl border border-[var(--border-gold)] bg-[#12100d] p-6 shadow-2xl safe-bottom sm:rounded-2xl relative overflow-hidden glow-gold-strong rise-in"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-[var(--accent-gold)]/10 blur-2xl pointer-events-none" />
@@ -904,7 +909,7 @@ export function BookingPage({ language = 'sq' }) {
               <X size={16} />
             </button>
 
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--border-gold)] bg-[var(--accent-gold-muted)] text-[var(--accent-gold)]">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--border-gold)] bg-[var(--accent-gold-muted)] text-[var(--accent-gold)] shadow-[0_0_30px_-4px_rgba(200,169,126,0.7)] animate-float">
               <CheckCircle2 size={32} />
             </div>
 
